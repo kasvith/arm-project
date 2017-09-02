@@ -35,18 +35,7 @@ original_new_line:
     b original_loop
 
 original_print:
-    @allocate stack for input
-    sub	sp, sp, #4
-
-    ldr	r0, =format_int
-    mov	r1, sp
-    bl	scanf	@scanf("%d",sp)
-
-    @copy rows from stack to register
-    ldr	r1, [sp,#0]
-
-    add sp, sp, #4
-
+	bl scan_int
     ldr r0, =format_int_space
     bl printf
 
@@ -90,17 +79,7 @@ inversion_new_line:
     b inversion_loop
 
 inversion_print:
-    @allocate stack for input
-    sub	sp, sp, #4
-
-    ldr	r0, =format_int
-    mov	r1, sp
-    bl	scanf	@scanf("%d",sp)
-
-    @copy rows from stack to register
-    ldr	r1, [sp,#0]
-    add sp, sp, #4
-
+    bl scan_int
     ldr r0, =format_int_space
     rsb r1, r1, #255
     bl printf
@@ -190,43 +169,43 @@ flip:
 	ldr r0, =format_flip
 	bl printf
 
-	@ r3 i = 0
-	mov r3, #0
+	@ r5 i = 0
+	mov r5, #0
 	b flip_outer_loop
 
 flip_outer_loop:
-	cmp r3, r10 @ i < rows
+	cmp r5, r10 @ i < rows
 	beq exit @ exit if rows == i
 
-	mov r4, #0 @ j = 0
+	mov r6, #0 @ r6 j = 0
 	b flip_input_loop
 
 
 flip_input_loop:
-	cmp r4, r11 @ j , cols
+	cmp r6, r11 @ j , cols
 	beq flip_print_loop @ start printing when j == cols
 
 	@ do scan_int
 	bl scan_int
 	push {r1}
 
-	add r4, r4, #1
+	add r6, r6, #1 @ j++
 	b flip_input_loop
 
 flip_print:
-	mov r4, #0 @ j = 0
+	mov r6, #0 @ j = 0
 	b flip_print_loop
 
 flip_print_loop:
-	cmp r4, #0 @ j == 0
-	beq flip_new_line @ go to new line
+	cmp r6, #0 @ j == cols
+	beq flip_new_line @ go to new line if true
 
-	@ do print
+	@ pop and do print
 	pop {r1}
 	ldr r0, =format_int_space
 	bl printf
 
-	sub r4, r4, #1 @ j++
+	sub r6, r6, #1 @ j--
 	b flip_print_loop
 
 flip_new_line:
@@ -234,7 +213,7 @@ flip_new_line:
 	bl printf
 
 	@ i++
-	add r3, r3, #1
+	add r5, r5, #1
 	b flip_outer_loop
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -333,6 +312,7 @@ main:
 
 @ data memory
 .data
+	format_reg: .asciz "reg value %d\n"
     format_new_line : .asciz "\n"
     format_int: .asciz "%d"
     format_int_space: .asciz "%d "
