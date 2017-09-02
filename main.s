@@ -262,42 +262,29 @@ main:
     @ cols = r11
     @ opcode = r12
 
-    @allocate stack for input
-    sub	sp, sp, #4
-
     @ Get rows from user
     	@scanf to get rows
-    	ldr	r0, =format_int
-    	mov	r1, sp
-    	bl	scanf	@scanf("%d",sp)
+    	bl scan_int
 
-        @copy rows from stack to register
-    	ldr	r10, [sp,#0]
+        @store rows in r10
+    	mov	r10, r1
     @end get rows from users
 
     @ Get cols from user
-    	@scanf to get rows
-    	ldr	r0, =format_int
-    	mov	r1, sp
-    	bl	scanf	@scanf("%d",sp)
+    	@scanf to get cols
+    	bl scan_int
 
-        @copy cols from stack to register
-    	ldr	r11, [sp,#0]
+        @tore cols in r11
+    	mov	r11, r1
     @ end get cols from user
 
     @ Get opcode from user
     	@scanf to get opcode
-    	ldr	r0, =format_int
-    	mov	r1, sp
-    	bl	scanf	@scanf("%d",sp)
-
-        @copy opcode from stack to register
-    	ldr	r12, [sp,#0]
+    	bl scan_int
+        @store opcode in r12
+    	mov r12, r1
 
     @ end get opcode from user
-
-    @release stack
-    add	sp, sp, #4
 
 	@ select the operation
     cmp r12, #0
@@ -312,7 +299,6 @@ main:
 
 @ data memory
 .data
-	format_reg: .asciz "reg value %d\n"
     format_new_line : .asciz "\n"
     format_int: .asciz "%d"
     format_int_space: .asciz "%d "
